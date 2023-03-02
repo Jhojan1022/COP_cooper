@@ -6,6 +6,23 @@ cargosForm()
 actividadesForm()
 
 
+function fDate(d) {
+   //2023-02-28T09:05:39.000Z
+
+   d = d.replace("T", " ")
+   d = d.replace("Z", "")
+   d = d.replace(".", ":")
+
+   const tmpDate = new Date(d)
+   const tmpTime  = new Date(d.replace(/-/g, '\/').replace(/T.+/, ''))
+   const fymd = tmpDate.toLocaleDateString("en-US").split("/")
+
+   console.log(d)
+console.log(tmpTime.toLocaleTimeString("it-IT"))
+   console.log(fymd[2] + "-" + fymd[0] + "-" + fymd[1] + " " + tmpDate.toLocaleTimeString("it-IT"))
+   return (fymd[2] + "-" + fymd[0] + "-" + fymd[1] + " " + tmpTime.toLocaleTimeString("it-IT"))
+}
+
 
 async function seguimientoHorarios(t) {
     const response = await fetch(url + "getSeguimientoHorarios");
@@ -102,9 +119,10 @@ async function actividadesForm() {
 
 function IniciarActividad() {
     //id_usuario, id_actividad, inicio, descripcion
-    console.log(sessionStorage.getItem("id"))
-    console.log(document.getElementById("actividades").value)
-    console.log(timestamp.getFullYear() + "-" + (timestamp.getMonth() + 1) + "-" + timestamp.getDate() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds())
+    const timestamp = new Date()
+    //console.log(sessionStorage.getItem("id"))
+    //console.log(document.getElementById("actividades").value)
+    //console.log(timestamp.getFullYear() + "-" + (timestamp.getMonth() + 1) + "-" + timestamp.getDate() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds())
 
     try {
         fetch(url + "iniciarActividad", {
@@ -126,8 +144,11 @@ function IniciarActividad() {
 
 function updateTime(d, e) {
     // Obtiene la fecha actual y la fecha pasada como parámetro
-    var now = new Date();
+    var now = new Date()
     var startDate = new Date(d);
+
+    //console.log(d + "fecha recibida")
+    //console.log(now + "Hoy")
 
     // Calcula la diferencia entre las fechas en milisegundos
     var difference = now - startDate;
@@ -152,7 +173,7 @@ function updateTime(d, e) {
 
     // Actualiza el texto en el elemento con el id "timer"
     document.getElementById(e).innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
-    console.log(days + "d " + hours + "h " + minutes + "m " + seconds + "s")
+    //console.log(days + "d " + hours + "h " + minutes + "m " + seconds + "s")
     // Espera un segundo y llama de nuevo a la función
     //setTimeout(updateTime(d), 1000);
 }
@@ -164,23 +185,53 @@ async function getActividadesUsuario() {
     const data = await response.json();
     const divActividades = document.getElementById("actividadesUsuarioTable");
     divActividades.innerHTML = "<tr><th>Nombre actividad</th><th>Fecha inicio</th><th>Duración</th><th>Acción</th></tr>";
+    console.log(data);
 
     for (let index = 0; index < data.length; index++) {
-        console.log(sessionStorage.getItem("id"))
-        console.log(data[index].usuarios_id_usuario)
-        if (sessionStorage.getItem("id") == data[index].usuarios_id_usuario) {
-            const dateFormat = new Date(data[index].fecha_inicio);
+        
+        const formatDate = new Date();
 
-            const html = '<tr><td>' + data[index].nombre_actividad + '</td><td>' + dateFormat.getFullYear()+"-"+dateFormat.getMonth()+"-" +dateFormat.getDate()+" " + dateFormat.getHours()+":"+dateFormat.getMinutes()+":" + dateFormat.getSeconds()+ '</td><td id="act' + index + '">' + data[index].fecha_inicio + '</td><td><button>Finalizar</button></td></tr>'
+        if (sessionStorage.getItem("id") == data[index].usuarios_id_usuario) {
+            const dateFormat = new Date(data[index].fecha_inicio)
+
+            const html = '<tr><td>' + data[index].nombre_actividad + '</td><td>' +fDate(data[index].fecha_inicio)+ '</td><td id="act'+index+'"><td><button onclick="finalizarActividad('+data[index].id_actividad+', `'+data[index].fecha_inicio+'`)">Finalizar</button></td></tr>'
             divActividades.innerHTML += html;
+            const tmp = dateFormat.toLocaleDateString()
             setInterval(() => {
-                updateTime(data[index].fecha_inicio, "act" + index)
+                updateTime(fDate(data[index].fecha_inicio), ("act" + index))
             }, 1000);
         }
 
     }
 
     console.log(data)
+}
+
+function finalizarActividad (id, date) {
+    console.log("finalizar actividad " + id)
+    console.log("finalizar actividad " + date)
+
+    const timestamp = new Date();
+
+    const formatDate = new Date(date);
+    console.log(formatDate.getFullYear() + "-"+formatDate.getMonth()+"-"+formatDate.getDate()+" " + formatDate.getMinutes()+":"+formatDate.getSeconds()+":"+formatDate.getMilliseconds());
+    //finalizarActividad
+    try {
+        fetch(url + "finalizarActividad", {
+            method: 'PUT',
+            body: JSON.stringify({
+                "id_usuario": sessionStorage.getItem("id"),
+                "id_actividad": Number(id),
+                "inicio": formatDate.getFullYear() + "-"+formatDate.getMonth()+"-"+formatDate.getDate()+" " + formatDate.getMinutes()+":"+formatDate.getSeconds()+":"+formatDate.getMilliseconds(),
+                "fin": timestamp.getFullYear() + "-" + (timestamp.getMonth() + 1) + "-" + timestamp.getDate() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds(),
+            }),
+            headers: { "Content-Type": "application/json" }
+        })
+        alert("Registro actividad exitoso")
+        getActividadesUsuario()
+    } catch (error) {
+        alert("Ocurrió un error")
+    }
 }
 
 getActividadesUsuario()
