@@ -51,6 +51,9 @@ function registrarIngreso() {
             }),
             headers: { "Content-Type": "application/json" }
         })
+        sessionStorage.setItem("i", 1)
+        document.getElementById("ringreso").disabled = true
+        document.getElementById("rsalida").disabled = false
         alert("Registro de ingreso exitoso")
     } catch (error) {
         alert("Ocurrió un error")
@@ -77,6 +80,10 @@ async function registrarSalida() {
                     }),
                     headers: { "Content-Type": "application/json" }
                 })
+        sessionStorage.setItem("i", 0)
+
+        document.getElementById("ringreso").disabled = false
+                document.getElementById("rsalida").disabled = true
                 alert("Registro de salida exitoso")
             } catch (error) {
                 alert("Ocurrió un error")
