@@ -163,7 +163,7 @@ async function IniciarActividad() {
                 headers: { "Content-Type": "application/json" }
             })
             alert("Registro actividad exitoso")
-            getActividadesUsuario()
+            location.reload()
         } catch (error) {
             alert("Ocurrió un error")
         }
