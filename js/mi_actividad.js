@@ -122,53 +122,48 @@ async function actividadesForm() {
 
 async function IniciarActividad() {
 
-    const responsea = await fetch(url + "getActividadesUsuario");
-    const dataa = await responsea.json();
-    if (dataa.length < 1) {
-        alert("Para iniciar una actividad primero debe registrar su ingreso laboral")
-    }else {
 
-        const response = await fetch(url + "getActividadesUsuario");
-        const data = await response.json();
-        let actividades = []
-        let exist = false;
+    const response = await fetch(url + "getActividadesUsuario");
+    const data = await response.json();
+    let actividades = []
+    let exist = false;
 
-        console.log(data)
+    console.log(data)
 
-        for (let index = 0; index < data.length; index++) {
-            if (document.getElementById("actividades").value == data[index].id_actividad) {
-                exist = true
-            }
-        }
-
-
-        if (exist == false) {
-            //id_usuario, id_actividad, inicio, descripcion
-            const timestamp = new Date()
-            //console.log(sessionStorage.getItem("id"))
-            //console.log(document.getElementById("actividades").value)
-            //console.log(timestamp.getFullYear() + "-" + (timestamp.getMonth() + 1) + "-" + timestamp.getDate() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds())
-
-            try {
-                fetch(url + "iniciarActividad", {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "id_usuario": sessionStorage.getItem("id"),
-                        "id_actividad": Number(document.getElementById("actividades").value),
-                        "inicio": timestamp.getFullYear() + "-" + (timestamp.getMonth() + 1) + "-" + timestamp.getDate() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds(),
-                        "descripcion": document.getElementById("observaciones").value
-                    }),
-                    headers: { "Content-Type": "application/json" }
-                })
-                alert("Registro actividad exitoso")
-                getActividadesUsuario()
-            } catch (error) {
-                alert("Ocurrió un error")
-            }
-        } else {
-            alert("La actividad en curso ya existe")
+    for (let index = 0; index < data.length; index++) {
+        if (document.getElementById("actividades").value == data[index].id_actividad) {
+            exist = true
         }
     }
+
+
+    if (exist == false) {
+        //id_usuario, id_actividad, inicio, descripcion
+        const timestamp = new Date()
+        //console.log(sessionStorage.getItem("id"))
+        //console.log(document.getElementById("actividades").value)
+        //console.log(timestamp.getFullYear() + "-" + (timestamp.getMonth() + 1) + "-" + timestamp.getDate() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds())
+
+        try {
+            fetch(url + "iniciarActividad", {
+                method: 'POST',
+                body: JSON.stringify({
+                    "id_usuario": sessionStorage.getItem("id"),
+                    "id_actividad": Number(document.getElementById("actividades").value),
+                    "inicio": timestamp.getFullYear() + "-" + (timestamp.getMonth() + 1) + "-" + timestamp.getDate() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds(),
+                    "descripcion": document.getElementById("observaciones").value
+                }),
+                headers: { "Content-Type": "application/json" }
+            })
+            alert("Registro actividad exitoso")
+            getActividadesUsuario()
+        } catch (error) {
+            alert("Ocurrió un error")
+        }
+    } else {
+        alert("La actividad en curso ya existe")
+    }
+
 }
 
 function updateTime(d, e) {
