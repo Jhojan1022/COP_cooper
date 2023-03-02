@@ -215,7 +215,7 @@ async function getActividadesUsuario() {
     const response = await fetch(url + "getActividadesUsuario");
     const data = await response.json();
     const divActividades = document.getElementById("actividadesUsuarioTable");
-    divActividades.innerHTML = "<tr><th>Nombre actividad</th><th>Fecha inicio</th><th>Duración</th><th>Acción</th></tr>";
+    divActividades.innerHTML = "<tr><th>Nombre actividad</th><th>Fecha inicio</th><th>Duración</th><th>Cantidad</th><th>Acción</th></tr>";
     let actividades = []
     console.log(data);
 
@@ -230,7 +230,7 @@ async function getActividadesUsuario() {
         if (sessionStorage.getItem("id") == data[index].usuarios_id_usuario) {
             const dateFormat = new Date(data[index].fecha_inicio)
 
-            const html = '<tr><td>' + data[index].nombre_actividad + '</td><td>' + fDate(data[index].fecha_inicio) + '</td><td id="act' + index + '"><td><button onclick="finalizarActividad(' + data[index].id_actividad + ')">Finalizar</button></td></tr>'
+            const html = '<tr><td>' + data[index].nombre_actividad + '</td><td>' + fDate(data[index].fecha_inicio) + '</td><td id="act' + index + '"><td><input type="number" style="width: 50px; height: 30px; margin: auto; padding: 0px"></td><td><button onclick="finalizarActividad(' + data[index].id_actividad + ')">Finalizar</button></td></tr>'
             divActividades.innerHTML += html;
             const tmp = dateFormat.toLocaleDateString()
             setInterval(() => {
